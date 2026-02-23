@@ -212,8 +212,6 @@ class TRKState:
         if not self._dispensing:
             return
         self._dispensing = False
-        if self._disp_thread:
-            self._disp_thread.join(timeout=0.5)
         with self._lock:
             self.status = ST_DONE
             self.cause  = CAUSE_NORMAL
@@ -968,8 +966,8 @@ class App(tk.Tk):
             state=tk.NORMAL if lift_ok else tk.DISABLED,
             bg='#1a5c2a' if lift_ok else '#2a2a2a')
 
-        # "Повесить пистолет" активна в статусах '1', '2', '3' (кран поднят)
-        hang_ok = trk.status in (ST_OFF_RK_OUT, ST_AUTHORIZED, ST_DISPENSING)
+        # "Повесить пистолет" активна в '1', '2', '3', '4' (кран поднят)
+        hang_ok = trk.status in (ST_OFF_RK_OUT, ST_AUTHORIZED, ST_DISPENSING, ST_DONE)
         self._hang_btn.config(
             state=tk.NORMAL if hang_ok else tk.DISABLED,
             bg='#5c1a1a' if hang_ok else '#2a2a2a')
@@ -1115,6 +1113,10 @@ class App(tk.Tk):
             trk.stop_dispensing()
             trk.rk_in = True
             self._log_cb('[КНОПКА] Пистолет повешен  >>  DONE(4)  ОТПУСК ОСТАНОВЛЕН')
+        elif trk.status == ST_DONE:
+            trk.rk_in  = True
+            trk.status = ST_OFF_RK_IN
+            self._log_cb('[КНОПКА] Пистолет повешен  >>  OFF_RK_IN(0)')
 
     def _start_dispensing(self):
         """Кнопка 'Старт' — начать отпуск топлива."""
