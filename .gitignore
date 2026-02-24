@@ -8,3 +8,5 @@ read_doc*.ps1
 protocol_text.txt
 EmuAZT2/
 .minimax/
+.gaskitlink/
+gaskitlink/
